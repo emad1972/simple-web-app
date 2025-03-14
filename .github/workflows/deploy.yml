@@ -1,0 +1,26 @@
+name: Deploy Flask App to GitHub Container Registry
+
+on:
+  push:
+    branches:
+      - main  # Runs when pushing to the main branch
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Log in to GitHub Container Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+    - name: Build and Tag Docker Image
+      run: |
+        docker build -t ghcr.io/${{ github.repository_owner }}/simple-web-app:latest .
+
+    - name: Push Docker Image to GitHub Container Registry
+      run: |
+        docker push ghcr.io/${{ github.repository_owner }}/simple-web-app:latest
+
